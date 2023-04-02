@@ -1,6 +1,8 @@
 # TicTacToe
 This is my attempt of creating the TicTacToe game in rust
 
+/preview.webm
+
 ## Todo
  > Add widget to choose what to play
  > Add a way to alert who won
