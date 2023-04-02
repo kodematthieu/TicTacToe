@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use druid::widget::Container;
 use druid::{WindowDesc, AppLauncher, Widget};
 use widget::{Content, AppState};

@@ -1,15 +1,14 @@
 use std::f64::consts::PI;
 use std::hint::unreachable_unchecked;
 use std::ops::Deref;
-use std::path::PathBuf;
-use std::time::{Instant, Duration};
+use std::time::Duration;
 
 use defaults::Defaults;
 use druid::kurbo::{Line, RoundedRect, Arc};
 use druid::piet::{StrokeStyle, LineJoin, LineCap, StrokeDash};
-use druid::{Widget, Data, Color, RenderContext, Point, Event, WidgetPod, Rect, Size, MouseEvent, MouseButton, TimerToken};
+use druid::{Widget, Data, Color, RenderContext, Point, Event, WidgetPod, MouseEvent, MouseButton, TimerToken};
 use keyframe::{ease, EasingFunction};
-use keyframe::functions::{EaseInCubic, Linear, EaseInOutQuart};
+use keyframe::functions::{EaseInCubic, EaseInOutQuart};
 
 use crate::engine::{State, TicTacToe};
 
@@ -165,7 +164,7 @@ impl ContentCell {
     }
 }
 impl Widget<AppState> for ContentCell {
-    fn event(&mut self, ctx: &mut druid::EventCtx, event: &Event, data: &mut AppState, env: &druid::Env) {
+    fn event(&mut self, ctx: &mut druid::EventCtx, event: &Event, data: &mut AppState, _: &druid::Env) {
         match event {
             &Event::AnimFrame(t) => {
                 ctx.request_paint();
@@ -195,7 +194,7 @@ impl Widget<AppState> for ContentCell {
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut druid::LifeCycleCtx, event: &druid::LifeCycle, data: &AppState, env: &druid::Env) {
+    fn lifecycle(&mut self, ctx: &mut druid::LifeCycleCtx, _: &druid::LifeCycle, data: &AppState, _: &druid::Env) {
         match (ctx.is_hot(), self.hover.is_reverse()) {
             (true, false) if !self.state.is_reverse() || data.game.done().is_some() => self.hover.reverse(),
             (true,  true) if !self.state.is_reverse() || data.game.done().is_some() => (),
@@ -208,7 +207,7 @@ impl Widget<AppState> for ContentCell {
         }
     }
 
-    fn update(&mut self, ctx: &mut druid::UpdateCtx, old_data: &AppState, data: &AppState, env: &druid::Env) {
+    fn update(&mut self, ctx: &mut druid::UpdateCtx, old_data: &AppState, data: &AppState, _: &druid::Env) {
         let state = data.game.get(self.idx as _);
         match state {
             State::N if old_data.game.get(self.idx as _) != State::N => {
@@ -219,11 +218,11 @@ impl Widget<AppState> for ContentCell {
         }
     }
 
-    fn layout(&mut self, ctx: &mut druid::LayoutCtx, bc: &druid::BoxConstraints, data: &AppState, env: &druid::Env) -> druid::Size {
+    fn layout(&mut self, _: &mut druid::LayoutCtx, bc: &druid::BoxConstraints, _: &AppState, _: &druid::Env) -> druid::Size {
         bc.constrain_aspect_ratio(1.0, bc.max().width / 3.0)
     }
 
-    fn paint(&mut self, ctx: &mut druid::PaintCtx, data: &AppState, env: &druid::Env) {
+    fn paint(&mut self, ctx: &mut druid::PaintCtx, _: &AppState, _: &druid::Env) {
         const STATE_WIDTH: f64 = 7.0;
         const STATE_SCALE: f64 = 0.5;
         const STATE_COLOR: Color = Color::grey8(200);
@@ -249,13 +248,7 @@ impl Widget<AppState> for ContentCell {
             let shape = RoundedRect::new(hover_min, hover_min, hover_max, hover_max, hover_len * HOVER_RADII);
             ctx.fill(shape, &HOVER_COLOR.with_alpha(hover));
         }
-
-        let line_style = StrokeStyle {
-            line_join: LineJoin::Round,
-            line_cap: LineCap::Round,
-            dash_pattern: StrokeDash::default(),
-            dash_offset: 0.0
-        };
+        
         if *self.state.data() {
             let len = size * STATE_SCALE * *self.state;
             if len > 0.0 {
