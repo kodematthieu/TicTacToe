@@ -165,6 +165,7 @@ impl GridCell {
 }
 impl Widget<AppState> for GridCell {
     fn event(&mut self, ctx: &mut druid::EventCtx, event: &Event, data: &mut AppState, _: &druid::Env) {
+        let mut hot_change = false;
         match event {
             &Event::AnimFrame(t) => {
                 ctx.request_paint();
@@ -188,24 +189,30 @@ impl Widget<AppState> for GridCell {
                     self.state.reverse();
                     ctx.request_anim_frame();
                     ctx.request_update();
+                    hot_change = true;
                 }
+            },
+            &Event::MouseMove(_) => {
+                hot_change = true;
+            }
+            _ => ()
+        }
+        
+        match (ctx.is_hot(), self.hover.is_reverse()) {
+            (true, false) if !self.state.is_reverse() || data.game.done().is_some() => {
+                self.hover.reverse();
+                ctx.request_anim_frame();
+            },
+            (true,  true) if !self.state.is_reverse() || data.game.done().is_some() => (),
+            (x, y) if x == y => {
+                self.hover.reverse();
+                ctx.request_anim_frame();
             },
             _ => ()
         }
     }
 
-    fn lifecycle(&mut self, ctx: &mut druid::LifeCycleCtx, _: &druid::LifeCycle, data: &AppState, _: &druid::Env) {
-        match (ctx.is_hot(), self.hover.is_reverse()) {
-            (true, false) if !self.state.is_reverse() || data.game.done().is_some() => self.hover.reverse(),
-            (true,  true) if !self.state.is_reverse() || data.game.done().is_some() => (),
-            (x, y) if x == y => self.hover.reverse(),
-            _ => ()
-        }
-
-        if !self.hover.finished() {
-            ctx.request_anim_frame();
-        }
-    }
+    fn lifecycle(&mut self, ctx: &mut druid::LifeCycleCtx, _: &druid::LifeCycle, data: &AppState, _: &druid::Env) {}
 
     fn update(&mut self, ctx: &mut druid::UpdateCtx, old_data: &AppState, data: &AppState, _: &druid::Env) {
         let state = data.game.get(self.idx as _);
