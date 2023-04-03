@@ -145,12 +145,12 @@ impl<T: Sized, E: EasingFunction, const D: u64> Deref for ReversibleAnimate<T, E
     }
 }
 
-pub struct ContentCell {
+pub struct GridCell {
     idx: u8,
     state: ReversibleAnimate<bool, EaseInOutQuart, 500>,
     hover: ReversibleAnimate<(), EaseInOutQuart, 100>
 }
-impl ContentCell {
+impl GridCell {
     fn new(idx: u8) -> Self {
         let mut state = ReversibleAnimate::default();
         state.reverse();
@@ -163,7 +163,7 @@ impl ContentCell {
         }
     }
 }
-impl Widget<AppState> for ContentCell {
+impl Widget<AppState> for GridCell {
     fn event(&mut self, ctx: &mut druid::EventCtx, event: &Event, data: &mut AppState, _: &druid::Env) {
         match event {
             &Event::AnimFrame(t) => {
@@ -273,13 +273,13 @@ impl Widget<AppState> for ContentCell {
     }
 }
 
-pub struct Content {
+pub struct Grid {
     init_anim: Animate<(), EaseInCubic, 1000>,
     done_anim: ReversibleAnimate<u8, EaseInCubic, 500>,
-    cells: [WidgetPod<AppState, ContentCell>; 9],
+    cells: [WidgetPod<AppState, GridCell>; 9],
     timer: TimerToken
 }
-impl Default for Content {
+impl Default for Grid {
     fn default() -> Self {
         let mut done_anim = ReversibleAnimate::default();
         done_anim.reverse();
@@ -288,20 +288,20 @@ impl Default for Content {
             done_anim,
             timer: TimerToken::INVALID,
             cells: [
-                WidgetPod::new(ContentCell::new(0)),
-                WidgetPod::new(ContentCell::new(1)),
-                WidgetPod::new(ContentCell::new(2)),
-                WidgetPod::new(ContentCell::new(3)),
-                WidgetPod::new(ContentCell::new(4)),
-                WidgetPod::new(ContentCell::new(5)),
-                WidgetPod::new(ContentCell::new(6)),
-                WidgetPod::new(ContentCell::new(7)),
-                WidgetPod::new(ContentCell::new(8)),
+                WidgetPod::new(GridCell::new(0)),
+                WidgetPod::new(GridCell::new(1)),
+                WidgetPod::new(GridCell::new(2)),
+                WidgetPod::new(GridCell::new(3)),
+                WidgetPod::new(GridCell::new(4)),
+                WidgetPod::new(GridCell::new(5)),
+                WidgetPod::new(GridCell::new(6)),
+                WidgetPod::new(GridCell::new(7)),
+                WidgetPod::new(GridCell::new(8)),
             ]
         }
     }
 }
-impl Widget<AppState> for Content {
+impl Widget<AppState> for Grid {
     fn event(&mut self, ctx: &mut druid::EventCtx, event: &Event, data: &mut AppState, env: &druid::Env) {
         match event {
             &Event::AnimFrame(t) => {

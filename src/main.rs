@@ -2,7 +2,7 @@
 
 use druid::widget::Container;
 use druid::{WindowDesc, AppLauncher, Widget};
-use widget::{Content, AppState};
+use widget::{Grid, AppState};
 
 mod engine;
 mod widget;
@@ -18,5 +18,5 @@ fn main() {
         .expect("Failed to launch application");
 }
 fn build_ui_widget() -> impl Widget<AppState> {
-    Container::new(Content::default())
+    Container::new(Grid::default())
 }
